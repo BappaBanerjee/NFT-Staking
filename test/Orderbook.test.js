@@ -272,4 +272,22 @@ describe("orderbook testing", function () {
       expect(buyorder.price).to.equal(BigInt(100000));
     });
   });
+
+  describe("buying at marketprice", async function () {
+    it("should revert the transactio with msg no sell orders present", async function () {
+      await expect(orderbook.buyAtMarketPrice(10000)).to.be.revertedWith(
+        "no sell orders present"
+      );
+    });
+
+    describe("buying", async function () {
+      beforeEach(async function () {
+        await orderbook.placeSellOrder(100000, 50000);
+        await orderbook.placeSellOrder(80000, 50000);
+        await orderbook.placeSellOrder(60000, 50000);
+      });
+
+      it("should revert the buy transaxtion", async function () {});
+    });
+  });
 });

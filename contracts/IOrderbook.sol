@@ -16,6 +16,4 @@ interface IOrderbook {
         address baseToken;
         address quoteToken;
     }
-
-    function placeBuyOrder(uint _limitPrice, uint _quantity) external;
 }
