@@ -1,93 +1,153 @@
-# Sample Hardhat Project
-
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
-
-Try running some of the following tasks:
-
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
-```
-
-run this command to install the dependencies without any hassel
-
-```
-yarn add --dev hardhat @nomiclabs/hardhat-ethers@npm:hardhat-deploy-ethers ethers
-```
-
-# Decentralized Exchange (DEX) Smart Contract
+# UpgradingStaking Smart Contract
 
 ## Overview
 
-This smart contract implements a basic decentralized exchange (DEX) where users can place buy and sell orders for trading tokens. The DEX supports limit orders, market orders, and provides a simple order matching mechanism.
+The `UpgradingStaking` contract allows users to stake their NFTs and earn ERC20 reward tokens per block. It is an upgradable contract using OpenZeppelin's upgradeable library.
 
-## Contract Structure
+### Key Features:
 
-### Orderbook Contract
+- **Staking:** Users can stake one or multiple NFTs.
+- **Reward System:** Users earn a specified amount of reward tokens per block for each staked NFT.
+- **Unstaking & Withdrawal:** Users can unstake their NFTs, with a defined unbonding period before they can withdraw.
+- **Upgradeable Contract:** The contract can be upgraded without losing the state.
 
-- `Orderbook` contract is the main contract that manages buy and sell orders.
-- Implements the `IOrderbook` interface.
-- Keeps track of buy and sell orders in separate arrays.
-- Handles order placement, order matching, and token balances.
+## Prerequisites
 
-### Dependencies
+Before deploying and testing this contract, ensure you have the following installed:
 
-- Uses ERC-20 token interface (`IERC20`) for interacting with ERC-20 compliant tokens.
-- Relies on the `IOrderbook` interface for abstraction.
+- [Node.js](https://nodejs.org/) (v20.x or higher)
+- [npm](https://www.npmjs.com/get-npm) or [yarn](https://yarnpkg.com/)
+- [Hardhat](https://hardhat.org/) - Ethereum development environment
+- [Metamask](https://metamask.io/) for interacting with the contract.
 
-## Token Management
+## Installation
 
-- Tokens supported: `BASE` and `QUOTE`.
-- Initial token balances are set during contract deployment.
+1. **Clone the repository:**
 
-## Order Placement
+   ```bash
+   git clone <repository_url>
+   cd <repository_folder>
+   ```
 
-- Users can place buy and sell orders with specified limit prices and quantities.
-- Buy orders are arranged in ascending order based on limit prices.
-- Sell orders are arranged in descending order based on limit prices.
+2. **Install the dependencies:**
 
-## Order Matching
+   ```bash
+   npm install
+   ```
 
-- Matchmaking occurs when a new order is placed.
-- Matches are made based on the limit price and quantity of buy and sell orders.
-- Partial fills are supported, and remaining quantities are updated accordingly.
+   or
 
-## Market Orders
+   ```bash
+   yarn install
+   ```
 
-- Users can execute market orders at the current market prices.
-- Market buy orders purchase from the lowest available sell orders.
-- Market sell orders sell to the highest available buy orders.
+## Deployment
 
-## Functions
+1. **Configure the deployment:**
 
-- `deposit`: Allows users to deposit tokens into the exchange.
-- `placeBuyOrder`: Places a limit buy order on the orderbook.
-- `placeSellOrder`: Places a limit sell order on the orderbook.
-- `buyAtMarketPrice`: Executes a market buy order at the current market prices.
-- `sellAtMarketPrice`: Executes a market sell order at the current market prices.
-- `getBuyOrders`: Retrieves the current buy orders.
-- `getSellOrders`: Retrieves the current sell orders.
+   Update the `hardhat.config.js` file with your preferred network settings.
 
-## Example Usage
+2. **Deploy the contract:**
 
-1. Deploy the contract.
-2. Deposit tokens using the `deposit` function.
-3. Place limit buy or sell orders using `placeBuyOrder` or `placeSellOrder`.
-4. Execute market orders using `buyAtMarketPrice` or `sellAtMarketPrice`.
-5. Monitor orderbook status using `getBuyOrders` and `getSellOrders`.
+   ```bash
+   npx hardhat deploy --network <network_name>
+   ```
 
-## Token Standards
+   will deploy all the contracts to the respctive network. We can also use tags to deploy specific contract.
 
-- This contract is designed to work with ERC-20 compliant tokens.
-- Ensure tokens adhere to the ERC-20 standard for proper functionality.
+   ```bash
+   npx hardhat run scripts/upgradeStaking.js --network <network_name>
+   ```
 
-## License
+   Run this script to upgrade the implementation contract.
+   Note : change the proxy address to your proxy address contract
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+   Replace `<network_name>` with the network you want to deploy to (e.g., `rinkeby`, `mainnet`, `localhost`).
 
-## Contact
+## Testing
 
-For any inquiries or issues, please contact the project maintainers.
+1. **Write tests:**
+
+   Use the `test` directory to write your tests using [Chai](https://www.chaijs.com/) and [Mocha](https://mochajs.org/).
+
+2. **Run tests:**
+
+   ```bash
+   npx hardhat test
+   ```
+
+   This will run all the tests defined in the `test` directory.
+
+## Interacting with the Contract
+
+1. **Connecting to the Contract:**
+
+   Use the deployed contract address to connect to it via web3 or ethers.js.
+
+   Example using ethers.js:
+
+   ```javascript
+   const { ethers } = require("ethers");
+   const stakingAddress = "0xYourDeployedContractAddress"; // Replace with your deployed contract address
+
+   const stakingAbi = [
+     // ABI of the UpgradingStaking contract
+   ];
+
+   const provider = new ethers.providers.Web3Provider(window.ethereum);
+   const signer = provider.getSigner();
+   const stakingContract = new ethers.Contract(
+     stakingAddress,
+     stakingAbi,
+     signer
+   );
+   ```
+
+2. **Staking NFTs:**
+
+   ```javascript
+   const stakingId = 1;
+   const nftContract = "0xYourNFTContractAddress";
+   const tokenId = 123;
+
+   await stakingContract.stake(stakingId, nftContract, tokenId);
+   ```
+
+3. **Claiming Rewards:**
+
+   ```javascript
+   await stakingContract.rewardClaim();
+   ```
+
+4. **Unstaking and Withdrawing NFTs:**
+
+   ```javascript
+   const stakedId = 1;
+
+   await stakingContract.unstake(stakedId);
+   await stakingContract.withdraw(stakedId);
+   ```
+
+## Upgrade the Contract
+
+1. **Make changes to the contract:**
+
+   Modify the contract as necessary.
+
+2. **Deploy the new implementation:**
+
+   ```bash
+   npx hardhat run scripts/upgradeStaking.js --network <network_name>
+   ```
+
+   if you want to test in localhost ensure you are running your local node
+
+   ```bash
+        npx hardhat node
+   ```
+
+   and in different terminal run the script
+
+   ```bash
+   npx hardhat run scripts/upgradeStaking.js --network localhost
+   ```

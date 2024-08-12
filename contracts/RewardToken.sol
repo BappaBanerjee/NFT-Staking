@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
-// pragma solidity ^0.8.20;
-pragma solidity ^0.8;
+pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
@@ -8,11 +7,11 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 
-contract QuoteToken is ERC20, ERC20Burnable, ERC20Pausable, Ownable, ERC20Permit {
+contract RewardToken is ERC20, ERC20Burnable, ERC20Pausable, Ownable, ERC20Permit {
     constructor(address initialOwner)
-        ERC20("QuoteToken", "QT")
+        ERC20("RewardToken", "RT")
         Ownable(initialOwner)
-        ERC20Permit("QuoteToken")
+        ERC20Permit("RewardToken")
     {}
 
     function pause() public onlyOwner {
